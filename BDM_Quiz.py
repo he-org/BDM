@@ -76,7 +76,7 @@ if __name__=='__main__':
     getLocation = udf(getLocation,ArrayType(DoubleType()))
 
 
-    bikes = spark.read.csv('/data/share/bdm/feb2014_citibike.csv',header=True,inferSchema=True,mode="DROPMALFORMED")
+    bikes = spark.read.csv('feb2014_citibike.csv',header=True,inferSchema=True,mode="DROPMALFORMED")
     raw_start_bikes = bikes.filter(bikes[r'start station name'] == station_name)
     raw_end_bikes = bikes.filter(bikes[r'end station name'] == station_name)
     start_bikes = raw_start_bikes.select(raw_start_bikes[r'start station name'].alias('Station_name'),startInterval(raw_start_bikes[r'starttime']).alias('time_points'),raw_start_bikes[r'start station latitude'].alias('latitude'),raw_start_bikes[r'start station longitude'].alias('longitude'))    
@@ -89,7 +89,7 @@ if __name__=='__main__':
     start_trip_time = start_bikes.select(explode(start_bikes.time_points).alias('time')).dropDuplicates().orderBy('time')
     end_trip_time = end_bikes.select(explode(end_bikes.time_points).alias('time')).dropDuplicates().orderBy('time')
 
-    taxi = spark.read.csv('/data/share/tlc/Hackathon2016/track2/feb2014.csv',header=True,inferSchema=True,mode="DROPMALFORMED")
+    taxi = spark.read.csv('feb2014.csv',header=True,inferSchema=True,mode="DROPMALFORMED")
     taxi_locations = taxi.select(getLocation(taxi['pickup_latitude'],taxi['pickup_longitude']).alias('pickup_location'),taxi['pickup_datetime'],getLocation(taxi['dropoff_latitude'],taxi['dropoff_longitude']).alias('dropoff_location'),taxi['dropoff_datetime'])
     taxi_locations = taxi_locations.withColumn('target_latitude',lit(target_location.value[0]))
     taxi_locations = taxi_locations.withColumn('target_longitude',lit(target_location.value[1]))
